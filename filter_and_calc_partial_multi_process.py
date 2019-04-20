@@ -10,28 +10,6 @@ def filter_and_calc(stream, min_age, max_age, keys, results):
     # assume the data has a column called age (number) and a column with gender (F/M)
     # for every age between min_age and max_age, count the number of F and M
 
-    counts = {'f': 0, 'm': 0, 'other': 0}
-    age_index = keys.index('age')
-    gender_index = keys.index('gender')
-    genders = frozenset(['f', 'm'])
-    for line in stream:
-        values = line.split(",")
-        # print("job({}) - {}".format(file_start_position,values))
-        age = float(values[age_index])
-        gender = values[gender_index].lower()
-        if min_age <= age <= max_age:
-            if gender in genders:
-                counts[gender] += 1
-            else:
-                counts['other'] += 1
-
-    return results.put(counts)
-
-
-def filter_and_calc_1(stream, min_age, max_age, keys, results):
-    # assume the data has a column called age (number) and a column with gender (F/M)
-    # for every age between min_age and max_age, count the number of F and M
-
     counts = {'f': 0, 'F': 0, 'm': 0, 'M': 0, 'other': 0}
     age_index = keys.index('age')
     gender_index = keys.index('gender')
@@ -41,7 +19,7 @@ def filter_and_calc_1(stream, min_age, max_age, keys, results):
         # print("job({}) - {}".format(file_start_position,values))
         age = float(values[age_index])
         if min_age <= age <= max_age:
-            gender = values[ gender_index ]
+            gender = values[gender_index]
             if gender in genders:
                 counts[gender] += 1
             else:
@@ -64,7 +42,7 @@ def multi_process_file_processing(file_name, min_age, max_age):
         file_size = os.path.getsize(file_name)
         appx_chunk_size = int((file_size - start) / num_of_processes)
         for _ in range(num_of_processes):
-            p = Process(target=filter_and_calc_1, args=[f.readlines(appx_chunk_size), min_age, max_age, keys, results])
+            p = Process(target=filter_and_calc, args=[f.readlines(appx_chunk_size), min_age, max_age, keys, results])
             processes.append(p)
             # Run process
             p.start()
