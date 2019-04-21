@@ -1,8 +1,6 @@
 import sys
 import os
-
 import time
-
 from multiprocessing import cpu_count, Queue, Process
 
 
@@ -30,10 +28,8 @@ def filter_and_calc(stream, min_age, max_age, keys, results):
     return results.put(counts)
 
 
-def multi_process_file_processing(file_name, min_age, max_age):
+def multi_process_file_processing(file_name, min_age, max_age, num_of_processes):
     results = Queue()
-
-    num_of_processes = cpu_count()
     processes = []
     # Calculate args for processes - devide file
     with open(file_name, "r") as f:
@@ -68,6 +64,7 @@ if __name__ == "__main__":
     file_name = sys.argv[1]
     min_age = float(sys.argv[2])
     max_age = float(sys.argv[3])
-    multi_process_file_processing(file_name, min_age, max_age)
+    num_of_processes = int(sys.argv[4])
+    multi_process_file_processing(file_name, min_age, max_age, num_of_processes)
     end_time = time.time()
     print("Job took {} seconds".format(end_time - start_time))

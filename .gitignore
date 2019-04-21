@@ -1,2 +1,4 @@
 *.csv
 env/
+*_results.txt
+*_results.*.txt
