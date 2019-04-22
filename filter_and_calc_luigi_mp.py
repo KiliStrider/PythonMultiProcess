@@ -45,6 +45,9 @@ class MergeResults(luigi.Task): # standard Luigi Task class
     min_age = luigi.FloatParameter()
     max_age = luigi.FloatParameter()
 
+    #def requires(self):
+    #    return []
+
     def run(self):
         with open(self.file, "r") as f:
             keys = f.readline().strip().split(",")

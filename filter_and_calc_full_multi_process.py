@@ -12,7 +12,7 @@ def move_stream_cursor_to_end_of_first_line(f, chunk):
     return f.tell(), chunk - len(b) - 1
 
 
-def filter_and_calc(file_name, start, appx_chunk, min_age, max_age, keys, results):
+def filter_and_calc(file_name, start, appx_chunk, additional_line_data_lenght, min_age, max_age, keys, results):
     # assume the data has a column called age (number) and a column with gender (F/M)
     # for every age between min_age and max_age, count the number of F and M
 
@@ -26,7 +26,7 @@ def filter_and_calc(file_name, start, appx_chunk, min_age, max_age, keys, result
         actual_start, chunk = move_stream_cursor_to_end_of_first_line(f, appx_chunk)
         read_counter = 0
         for line in f.readlines(chunk):
-            read_counter += len(line) + 1
+            read_counter += len(line) + additional_line_data_lenght
             #print("Job ({},{}) - {}".format(actual_start, chunk, line))
             values = line.split(",")
             age = float(values[age_index])
@@ -52,12 +52,22 @@ def multi_process_file_processing(file_name, min_age, max_age):
     processes = []
     # Calculate args for processes - devide file
     with open(file_name, "r") as f:
-        keys = f.readline().strip().split(",")
+        header_line = f.readline()
+        additional_line_data_lenght = f.tell() - len(header_line)
+        keys = header_line.strip().split(",")
         start = f.tell()
         file_size = os.path.getsize(file_name)
         appx_chunk_size = int((file_size - start) / num_of_processes)
         for i in range(num_of_processes):
-            p = Process(target=filter_and_calc, args=[file_name, start, appx_chunk_size, min_age, max_age, keys, results])
+            p = Process(target=filter_and_calc,
+                        args=[file_name,
+                              start,
+                              appx_chunk_size,
+                              additional_line_data_lenght,
+                              min_age,
+                              max_age,
+                              keys,
+                              results])
             processes.append(p)
             # Run process
             p.start()
